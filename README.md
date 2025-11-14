@@ -1,6 +1,3 @@
-<<<<<<< HEAD
-# starkbank-challenge-gv
-=======
 **StarkBank Challenge**
 
 Desafio: 
@@ -66,4 +63,3 @@ Uvicorn
 StarkBank SDK
 AWS Lambda / EventBridge
 Render
->>>>>>> f81bae3 (starkbank-challenge-gv)
