@@ -1,65 +1,105 @@
-**StarkBank Challenge**
+# StarkBank Challenge
 
-Desafio: 
+Este projeto implementa todo o fluxo do desafio proposto pela StarkBank utilizando **FastAPI**, **StarkBank SDK**, **Render** e **GitHub Actions** para automação.
 
-- Emitir automaticamente 8 a 12 invoices a cada 3 horas.
-- Receber via webhook o evento de pagamento de cada invoice.
-- Executar uma transferência automática do valor pago (descontadas as taxas) para a conta bancária definida pelo desafio.
+A aplicação em produção está acessível em:
 
-Todo o fluxo foi implementado utilizando FastAPI, SDK oficial da Stark Bank e execução agendada via AWS EventBridge + AWS Lambda.
+```
+https://starkbank-challenge-invoices.onrender.com
+```
 
-----
-1. Arquitetura da Solução
+---
 
-A aplicação é composta por três partes principais:
+## 🚀 Objetivo do Projeto
 
-1.1 FastAPI
-> Emite invoices
-> Processa o webhook de pagamento enviado pela StarkBank.
-> Gerar transferências automaticamente após a confirmação de pagamento.
+* Emitir automaticamente **8 a 12 invoices a cada 3 horas**.
+* Receber via webhook o **evento de pagamento** de cada invoice.
+* Efetuar uma **transferência automática** do valor pago (menos taxas) para a conta bancária definida no desafio.
 
-Rotas disponíveis:
-POST /api/invoices   → Emissão de invoices
-POST /api/webhook    → Recebimento de eventos
+---
+## 🏗️ Arquitetura da Solução
 
-1.2 AWS EventBridge + Lambda
-> Utilizado para agendar a emissão automática de invoices.
-> O Lambda executa uma chamada HTTP para a rota /api/invoices a cada 3 horas.
+### **1. FastAPI (Hospedada no Render)**
 
-1.3 StarkBank Webhook
+API principal responsável por:
 
->A Stark Bank envia eventos de invoice para o endpoint:
+* Gerar invoices sob demanda.
+* Processar o webhook enviado pela StarkBank.
+* Criar transferências automáticas quando um pagamento é confirmado.
 
+**Rotas públicas:**
+
+```
+POST /api/invoices      → Emite de 8 a 12 invoices
+POST /api/webhook       → Recebe eventos da StarkBank
+GET  /healthz           → Health check usado pelo Render
+```
+---
+
+### **2. GitHub Actions — Cron Job (A cada 3 horas)**
+
+Para garantir execução periódica sem depender do Render, um workflow em:
+
+```
+.github/workflows/trigger.yaml
+```
+
+executa a cada 3 horas e envia uma requisição POST para:
+
+```
+https://starkbank-challenge-invoices.onrender.com/api/invoices
+```
+
+Assim, as invoices são geradas automaticamente de forma confiável.
+
+---
+
+### **3. Webhook da StarkBank**
+
+A StarkBank envia eventos de pagamento para:
+
+```
 POST /api/webhook
+```
+---
 
-> Quando o evento indica paid, uma transferência é criada automaticamente.
-------
+## ⚙️ Como Rodar Localmente
 
+### **1. Instalar dependências**
 
-2. Como Executar o Projeto Localmente
-
-2.1 Instalar dependências
+```bash
 pip install -r requirements.txt
+```
 
-2.2 Iniciar o servidor
+### **2. Executar servidor**
+
+```bash
 uvicorn main:app --reload
+```
+
+### **3. Testar emissão de invoices**
+
+```bash
+POST http://localhost:8000/api/invoices
+```
+
+### **4. Testar webhook manualmente (opcional)**
+
+```bash
+POST http://localhost:8000/api/webhook
+```
+---
+
+## 🧰 Tecnologias Utilizadas
+
+* **Python 3.11**
+* **FastAPI**
+* **Uvicorn**
+* **StarkBank SDK**
+* **Render** (deploy da API)
+* **GitHub Actions** (disparo automático a cada 3h)
+---
 
 
-
-**Validação**
-
-Para validar o funcionamento do projeto:
-
-POST /api/invoices
-
-A transferência aparecerá como concluída no dashboard.
-
-
-3. Tecnologias Utilizadas
-
-Python 3.10+
-FastAPI
-Uvicorn
-StarkBank SDK
-AWS Lambda / EventBridge
-Render
+Gabriel Valzak
+gaa.henrique@lilve.com
