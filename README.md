@@ -83,10 +83,10 @@ uvicorn main:app --reload
 POST http://localhost:8000/api/invoices
 ```
 
-### **4. Testar webhook manualmente (opcional)**
+### **4. Bash**
 
 ```bash
-POST http://localhost:8000/api/webhook
+curl -i -X POST https://starkbank-challenge-invoices.onrender.com/api/invoices
 ```
 ---
 
